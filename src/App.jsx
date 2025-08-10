@@ -9,7 +9,8 @@ export default function LifeInNumbersPoetic() {
   const [tone, setTone] = useState("warm");
   const [gender, setGender] = useState("unspecified");
   const [smoking, setSmoking] = useState("never");
-  const [activity, setActivity] = useState("moderate-weekly"); // includes frequency
+  const [drinking, setDrinking] = useState("none");
+  const [activity, setActivity] = useState("moderate-weekly");
   const [conditions, setConditions] = useState("");
   const [useSmart, setUseSmart] = useState(true);
 
@@ -20,6 +21,7 @@ export default function LifeInNumbersPoetic() {
 
   const baselineLE = (g) => g === "male" ? 79 : g === "female" ? 83 : 81;
   const adjSmoking = (s) => s === "current" ? -8 : s === "former" ? -3 : 0;
+  const adjDrinking = (d) => d === "heavy" ? -5 : d === "moderate" ? -1 : 0;
   const adjActivity = (a) => a.includes("high") ? 2 : a.includes("low") ? -2 : 0;
   const adjConditions = (t) => {
     t = t.toLowerCase();
@@ -31,7 +33,9 @@ export default function LifeInNumbersPoetic() {
   };
 
   const ageNum = toInt(age, 0);
-  const expectedLifespan = Math.max(60, Math.min(100, baselineLE(gender) + adjSmoking(smoking) + adjActivity(activity) + adjConditions(conditions)));
+  const expectedLifespan = Math.max(60, Math.min(100,
+    baselineLE(gender) + adjSmoking(smoking) + adjDrinking(drinking) + adjActivity(activity) + adjConditions(conditions)
+  ));
   const yearsAhead = Math.max(0, useSmart ? expectedLifespan - ageNum : 10);
 
   const daysAhead = Math.round(yearsAhead * 365);
@@ -40,7 +44,7 @@ export default function LifeInNumbersPoetic() {
   const mealsAhead = Math.round(yearsAhead * 365 * 3);
 
   const hobbyLines = hobbies.map((h) => h.trim()).filter(Boolean).map((h) => {
-    let multiplier = 52; // default weekly
+    let multiplier = 52;
     if (activity.includes("monthly")) multiplier = 12;
     if (activity.includes("quarterly")) multiplier = 4;
     return {
@@ -73,7 +77,7 @@ export default function LifeInNumbersPoetic() {
         <header className="mb-6">
           <h1 className="text-3xl font-semibold">Life in Numbers — <span className="text-indigo-600">More to Enjoy</span></h1>
           <p className="mt-2 text-slate-600">All-positive. Toggle Smart estimates to tailor counts from public averages.</p>
-          <p className="mt-1 text-xs text-rose-500">Disclaimer: This tool provides encouraging, non-clinical estimates based on public averages and self-inputted factors. It is not a medical diagnosis or health advice.</p>
+          <p className="mt-1 text-xs text-rose-500 font-medium">Disclaimer: This tool provides encouraging, non-clinical estimates based on public averages and self-inputted factors. It is not a medical diagnosis, health advice, or a substitute for professional care.</p>
         </header>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -90,6 +94,11 @@ export default function LifeInNumbersPoetic() {
               <option value="never">Never smoked</option>
               <option value="former">Former smoker</option>
               <option value="current">Current smoker</option>
+            </select>
+            <select value={drinking} onChange={(e) => setDrinking(e.target.value)} className="w-full border p-2 rounded">
+              <option value="none">Does not drink</option>
+              <option value="moderate">Drinks moderately</option>
+              <option value="heavy">Drinks heavily</option>
             </select>
             <select value={activity} onChange={(e) => setActivity(e.target.value)} className="w-full border p-2 rounded">
               <option value="moderate-weekly">Activity: Moderate (Weekly)</option>
