@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 
-// Life in Numbers — Poetic MVP with Smart Estimates + Pets + Random closing line + Premium button
 export default function LifeInNumbersPoetic() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -22,14 +21,14 @@ export default function LifeInNumbersPoetic() {
     return Number.isFinite(n) ? n : d;
   };
 
-  // Baselines + adjustments (non-clinical)
+  // Baseline life expectancy and adjustments
   const baselineLE = (g) => (g === "male" ? 79 : g === "female" ? 83 : 81);
   const adjSmoking = (s) => (s === "current" ? -8 : s === "former" ? -3 : 0);
   const adjDrinking = (d) => (d === "heavy" ? -5 : d === "moderate" ? -1 : 0);
   const adjConditions = (t) => {
     t = t.toLowerCase();
     let adj = 0;
-    if (t.includes("diab")) adj -= 3;
+    if (t.includes("type1diabetes")) adj -= 3;
     if (t.includes("asthma")) adj -= 1;
     if (t.includes("hypertension")) adj -= 1;
     return adj;
@@ -40,12 +39,15 @@ export default function LifeInNumbersPoetic() {
     60,
     Math.min(
       100,
-      baselineLE(gender) + adjSmoking(smoking) + adjDrinking(drinking) + adjConditions(conditions)
+      baselineLE(gender) +
+        adjSmoking(smoking) +
+        adjDrinking(drinking) +
+        adjConditions(conditions)
     )
   );
   const yearsAhead = Math.max(0, useSmart ? expectedLifespan - ageNum : 10);
 
-  // Main counts (with commas)
+  // Counts
   const daysAhead = Math.round(yearsAhead * 365);
   const weekendsAhead = Math.round(yearsAhead * 104);
   const fullMoonsAhead = Math.round(yearsAhead * 12);
@@ -54,9 +56,17 @@ export default function LifeInNumbersPoetic() {
   // Hobbies
   const hobbyLines = [];
   if (weeklyHobby.trim())
-    hobbyLines.push({ label: weeklyHobby, total: Math.round(52 * yearsAhead), freq: "weekly" });
+    hobbyLines.push({
+      label: weeklyHobby,
+      total: Math.round(52 * yearsAhead),
+      freq: "weekly",
+    });
   if (monthlyHobby.trim())
-    hobbyLines.push({ label: monthlyHobby, total: Math.round(12 * yearsAhead), freq: "monthly" });
+    hobbyLines.push({
+      label: monthlyHobby,
+      total: Math.round(12 * yearsAhead),
+      freq: "monthly",
+    });
   if (quarterlyHobby.trim())
     hobbyLines.push({
       label: quarterlyHobby,
@@ -64,7 +74,7 @@ export default function LifeInNumbersPoetic() {
       freq: "quarterly",
     });
 
-  // Randomized closing line
+  // Random closing
   const closingOptions = [
     "Doesn’t it feel good to be alive?",
     "What a gift it is to be here for it all.",
@@ -130,7 +140,9 @@ export default function LifeInNumbersPoetic() {
       )
     );
     L.push(
-      toneWrap(`${mealsAhead.toLocaleString()} meals to enjoy — invitations to slow down and connect.`)
+      toneWrap(
+        `${mealsAhead.toLocaleString()} meals to enjoy — invitations to slow down and connect.`
+      )
     );
 
     const faces = Math.max(0, Math.round(yearsAhead * 180)).toLocaleString();
@@ -170,6 +182,16 @@ export default function LifeInNumbersPoetic() {
     petLine,
     closing,
   ]);
+
+  // Track Premium clicks
+  const handlePremiumClick = () => {
+    if (window.gtag) {
+      window.gtag("event", "premium_upgrade_click", {
+        event_category: "engagement",
+        event_label: "Upgrade to Premium Button",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-800">
@@ -219,7 +241,7 @@ export default function LifeInNumbersPoetic() {
             <select value={conditions} onChange={(e) => setConditions(e.target.value)} className="w-full border p-2 rounded">
               <option value="">Medical conditions (optional)</option>
               <option value="none">None</option>
-              <option value="diabetes">Diabetes</option>
+              <option value="type1diabetes">Type 1 Diabetes</option>
               <option value="asthma">Asthma</option>
               <option value="hypertension">Hypertension</option>
               <option value="other">Not on list</option>
@@ -246,12 +268,12 @@ export default function LifeInNumbersPoetic() {
           {/* Output */}
           <section className="md:col-span-2 bg-white rounded-2xl shadow p-5 space-y-4">
             {lines.map((line, i) => <p key={i} className="leading-relaxed">{line}</p>)}
-            {/* Upgrade to Premium Button */}
             <div className="mt-6">
               <a
                 href="https://forms.gle/h1ZXwiJq76HfgGT56"
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={handlePremiumClick}
                 className="inline-block px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow"
               >
                 Upgrade to Premium
@@ -260,7 +282,6 @@ export default function LifeInNumbersPoetic() {
           </section>
         </div>
 
-        {/* Footer branding */}
         <footer className="mt-10 text-center text-xs text-slate-500">
           This initiative is powered by Off the Record, On Purpose.
         </footer>
