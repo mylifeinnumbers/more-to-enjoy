@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 
-// Life in Numbers — Poetic MVP with Smart Estimates + Pets + Random closing line
+// Life in Numbers — Poetic MVP with Smart Estimates + Pets + Random closing line + Premium button
 export default function LifeInNumbersPoetic() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
@@ -14,8 +14,7 @@ export default function LifeInNumbersPoetic() {
   const [drinking, setDrinking] = useState("none");
   const [conditions, setConditions] = useState("");
   const [useSmart, setUseSmart] = useState(true);
-
-  const [petType, setPetType] = useState("none"); // dog | cat | other | none
+  const [petType, setPetType] = useState("none");
   const [petName, setPetName] = useState("");
 
   const toInt = (v, d = 0) => {
@@ -23,7 +22,7 @@ export default function LifeInNumbersPoetic() {
     return Number.isFinite(n) ? n : d;
   };
 
-  // Baselines + gentle adjustments (non-clinical)
+  // Baselines + adjustments (non-clinical)
   const baselineLE = (g) => (g === "male" ? 79 : g === "female" ? 83 : 81);
   const adjSmoking = (s) => (s === "current" ? -8 : s === "former" ? -3 : 0);
   const adjDrinking = (d) => (d === "heavy" ? -5 : d === "moderate" ? -1 : 0);
@@ -46,7 +45,7 @@ export default function LifeInNumbersPoetic() {
   );
   const yearsAhead = Math.max(0, useSmart ? expectedLifespan - ageNum : 10);
 
-  // Main counts (all formatted with commas)
+  // Main counts (with commas)
   const daysAhead = Math.round(yearsAhead * 365);
   const weekendsAhead = Math.round(yearsAhead * 104);
   const fullMoonsAhead = Math.round(yearsAhead * 12);
@@ -65,9 +64,7 @@ export default function LifeInNumbersPoetic() {
       freq: "quarterly",
     });
 
-  const toneWrap = (s) => (tone === "gentle" ? s.replace(/!/g, ".") : s);
-
-  // Randomized closing line (changes when inputs change)
+  // Randomized closing line
   const closingOptions = [
     "Doesn’t it feel good to be alive?",
     "What a gift it is to be here for it all.",
@@ -103,6 +100,8 @@ export default function LifeInNumbersPoetic() {
     return `Plenty of little moments with ${n} that feel like home.`;
   }, [petType, petName]);
 
+  const toneWrap = (s) => (tone === "gentle" ? s.replace(/!/g, ".") : s);
+
   const lines = useMemo(() => {
     const L = [];
     const firstName = name || "Friend";
@@ -134,7 +133,6 @@ export default function LifeInNumbersPoetic() {
       toneWrap(`${mealsAhead.toLocaleString()} meals to enjoy — invitations to slow down and connect.`)
     );
 
-    // Future faces — playful estimate tied to yearsAhead
     const faces = Math.max(0, Math.round(yearsAhead * 180)).toLocaleString();
     L.push(
       toneWrap(
@@ -155,7 +153,6 @@ export default function LifeInNumbersPoetic() {
 
     if (petLine) L.push(toneWrap(petLine));
 
-    // Encouraging randomized closer
     L.push(toneWrap(closing));
 
     return L;
@@ -201,52 +198,25 @@ export default function LifeInNumbersPoetic() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Inputs */}
           <section className="md:col-span-1 bg-white rounded-2xl shadow p-4 space-y-4">
-            <input
-              placeholder="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-            <input
-              placeholder="Age"
-              type="number"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-            <select
-              value={gender}
-              onChange={(e) => setGender(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Age" type="number" value={age} onChange={(e) => setAge(e.target.value)} className="w-full border p-2 rounded" />
+            <select value={gender} onChange={(e) => setGender(e.target.value)} className="w-full border p-2 rounded">
               <option value="unspecified">Gender (optional)</option>
               <option value="female">Female</option>
               <option value="male">Male</option>
               <option value="nonbinary">Non-binary</option>
             </select>
-            <select
-              value={smoking}
-              onChange={(e) => setSmoking(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <select value={smoking} onChange={(e) => setSmoking(e.target.value)} className="w-full border p-2 rounded">
               <option value="never">Never smoked</option>
               <option value="former">Former smoker</option>
               <option value="current">Current smoker</option>
             </select>
-            <select
-              value={drinking}
-              onChange={(e) => setDrinking(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <select value={drinking} onChange={(e) => setDrinking(e.target.value)} className="w-full border p-2 rounded">
               <option value="none">Does not drink</option>
               <option value="moderate">Drinks moderately</option>
               <option value="heavy">Drinks heavily</option>
             </select>
-            <select
-              value={conditions}
-              onChange={(e) => setConditions(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <select value={conditions} onChange={(e) => setConditions(e.target.value)} className="w-full border p-2 rounded">
               <option value="">Medical conditions (optional)</option>
               <option value="none">None</option>
               <option value="diabetes">Diabetes</option>
@@ -254,79 +224,46 @@ export default function LifeInNumbersPoetic() {
               <option value="hypertension">Hypertension</option>
               <option value="other">Not on list</option>
             </select>
-
-            <input
-              placeholder="Favourite weekly activity"
-              value={weeklyHobby}
-              onChange={(e) => setWeeklyHobby(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-            <input
-              placeholder="Favourite monthly activity"
-              value={monthlyHobby}
-              onChange={(e) => setMonthlyHobby(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-            <input
-              placeholder="Favourite quarterly activity"
-              value={quarterlyHobby}
-              onChange={(e) => setQuarterlyHobby(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-
-            {/* Pet fields */}
-            <select
-              value={petType}
-              onChange={(e) => setPetType(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <input placeholder="Favourite weekly activity" value={weeklyHobby} onChange={(e) => setWeeklyHobby(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Favourite monthly activity" value={monthlyHobby} onChange={(e) => setMonthlyHobby(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Favourite quarterly activity" value={quarterlyHobby} onChange={(e) => setQuarterlyHobby(e.target.value)} className="w-full border p-2 rounded" />
+            <select value={petType} onChange={(e) => setPetType(e.target.value)} className="w-full border p-2 rounded">
               <option value="none">Pet type (optional)</option>
               <option value="dog">Dog</option>
               <option value="cat">Cat</option>
               <option value="other">Other</option>
             </select>
-            <input
-              placeholder="Pet name (optional)"
-              value={petName}
-              onChange={(e) => setPetName(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-
-            <input
-              placeholder="Location (optional)"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full border p-2 rounded"
-            />
-
-            <select
-              value={tone}
-              onChange={(e) => setTone(e.target.value)}
-              className="w-full border p-2 rounded"
-            >
+            <input placeholder="Pet name (optional)" value={petName} onChange={(e) => setPetName(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Location (optional)" value={location} onChange={(e) => setLocation(e.target.value)} className="w-full border p-2 rounded" />
+            <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full border p-2 rounded">
               <option value="warm">Warm</option>
               <option value="gentle">Gentle</option>
               <option value="playful">Playful</option>
             </select>
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={useSmart}
-                onChange={(e) => setUseSmart(e.target.checked)}
-              />
-              Smart estimates
-            </label>
+            <label className="flex items-center gap-2"><input type="checkbox" checked={useSmart} onChange={(e) => setUseSmart(e.target.checked)} /> Smart estimates</label>
           </section>
 
           {/* Output */}
           <section className="md:col-span-2 bg-white rounded-2xl shadow p-5 space-y-4">
-            {lines.map((line, i) => (
-              <p key={i} className="leading-relaxed">
-                {line}
-              </p>
-            ))}
+            {lines.map((line, i) => <p key={i} className="leading-relaxed">{line}</p>)}
+            {/* Upgrade to Premium Button */}
+            <div className="mt-6">
+              <a
+                href="https://forms.gle/h1ZXwiJq76HfgGT56"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold shadow"
+              >
+                Upgrade to Premium
+              </a>
+            </div>
           </section>
         </div>
+
+        {/* Footer branding */}
+        <footer className="mt-10 text-center text-xs text-slate-500">
+          This initiative is powered by Off the Record, On Purpose.
+        </footer>
       </div>
     </div>
   );
