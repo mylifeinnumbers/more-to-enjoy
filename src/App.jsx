@@ -5,12 +5,13 @@ export default function LifeInNumbersPoetic() {
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [location, setLocation] = useState("");
-  const [hobbies, setHobbies] = useState(["", "", ""]);
+  const [weeklyHobby, setWeeklyHobby] = useState("");
+  const [monthlyHobby, setMonthlyHobby] = useState("");
+  const [quarterlyHobby, setQuarterlyHobby] = useState("");
   const [tone, setTone] = useState("warm");
   const [gender, setGender] = useState("unspecified");
   const [smoking, setSmoking] = useState("never");
   const [drinking, setDrinking] = useState("none");
-  const [activity, setActivity] = useState("moderate-weekly");
   const [conditions, setConditions] = useState("");
   const [useSmart, setUseSmart] = useState(true);
 
@@ -22,7 +23,6 @@ export default function LifeInNumbersPoetic() {
   const baselineLE = (g) => g === "male" ? 79 : g === "female" ? 83 : 81;
   const adjSmoking = (s) => s === "current" ? -8 : s === "former" ? -3 : 0;
   const adjDrinking = (d) => d === "heavy" ? -5 : d === "moderate" ? -1 : 0;
-  const adjActivity = (a) => a.includes("high") ? 2 : a.includes("low") ? -2 : 0;
   const adjConditions = (t) => {
     t = t.toLowerCase();
     let adj = 0;
@@ -34,7 +34,7 @@ export default function LifeInNumbersPoetic() {
 
   const ageNum = toInt(age, 0);
   const expectedLifespan = Math.max(60, Math.min(100,
-    baselineLE(gender) + adjSmoking(smoking) + adjDrinking(drinking) + adjActivity(activity) + adjConditions(conditions)
+    baselineLE(gender) + adjSmoking(smoking) + adjDrinking(drinking) + adjConditions(conditions)
   ));
   const yearsAhead = Math.max(0, useSmart ? expectedLifespan - ageNum : 10);
 
@@ -43,15 +43,10 @@ export default function LifeInNumbersPoetic() {
   const fullMoonsAhead = Math.round(yearsAhead * 12);
   const mealsAhead = Math.round(yearsAhead * 365 * 3);
 
-  const hobbyLines = hobbies.map((h) => h.trim()).filter(Boolean).map((h) => {
-    let multiplier = 52;
-    if (activity.includes("monthly")) multiplier = 12;
-    if (activity.includes("quarterly")) multiplier = 4;
-    return {
-      label: h,
-      total: Math.round(multiplier * yearsAhead)
-    };
-  });
+  const hobbyLines = [];
+  if (weeklyHobby.trim()) hobbyLines.push({ label: weeklyHobby, total: Math.round(52 * yearsAhead), freq: "weekly" });
+  if (monthlyHobby.trim()) hobbyLines.push({ label: monthlyHobby, total: Math.round(12 * yearsAhead), freq: "monthly" });
+  if (quarterlyHobby.trim()) hobbyLines.push({ label: quarterlyHobby, total: Math.round(4 * yearsAhead), freq: "quarterly" });
 
   const toneWrap = (s) => tone === "gentle" ? s.replace(/!/g, ".") : s;
 
@@ -65,11 +60,11 @@ export default function LifeInNumbersPoetic() {
     L.push(toneWrap(`${weekendsAhead} weekend mornings to stretch, sip slowly, and begin again.`));
     L.push(toneWrap(`${mealsAhead} meals to enjoy — invitations to slow down and connect.`));
     L.push(toneWrap(`${Math.round(yearsAhead * 180)}+ new faces you haven’t met yet — friends, mentors, and people who bring out your unfiltered self.`));
-    hobbyLines.forEach((h) => L.push(toneWrap(`${h.total} ${activity.split('-')[1]} ${h.label.toLowerCase()} moments to stack — even at this pace it becomes a beautiful pattern.`)));
+    hobbyLines.forEach((h) => L.push(toneWrap(`${h.total} ${h.freq} ${h.label.toLowerCase()} moments to stack — even at this pace it becomes a beautiful pattern.`)));
     if (location.trim()) L.push(toneWrap(`Plenty of ${location} days to notice what makes home feel like home.`));
     L.push(toneWrap(`And through it all: more laughter sneaking up on you, more pauses that feel like peace, more proof you’re allowed to take your time.`));
     return L;
-  }, [name, yearsAhead, daysAhead, fullMoonsAhead, weekendsAhead, mealsAhead, hobbyLines, location, tone, useSmart, activity]);
+  }, [name, yearsAhead, daysAhead, fullMoonsAhead, weekendsAhead, mealsAhead, hobbyLines, location, tone, useSmart]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white to-slate-50 text-slate-800">
@@ -78,6 +73,7 @@ export default function LifeInNumbersPoetic() {
           <h1 className="text-3xl font-semibold">Life in Numbers — <span className="text-indigo-600">More to Enjoy</span></h1>
           <p className="mt-2 text-slate-600">All-positive. Toggle Smart estimates to tailor counts from public averages.</p>
           <p className="mt-1 text-xs text-rose-500 font-medium">Disclaimer: This tool provides encouraging, non-clinical estimates based on public averages and self-inputted factors. It is not a medical diagnosis, health advice, or a substitute for professional care.</p>
+          <p className="mt-1 text-xs text-slate-500">Interested in a more comprehensive, personalized version? Email us at youremail@example.com for details about the paid upgrade.</p>
         </header>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -100,19 +96,17 @@ export default function LifeInNumbersPoetic() {
               <option value="moderate">Drinks moderately</option>
               <option value="heavy">Drinks heavily</option>
             </select>
-            <select value={activity} onChange={(e) => setActivity(e.target.value)} className="w-full border p-2 rounded">
-              <option value="moderate-weekly">Activity: Moderate (Weekly)</option>
-              <option value="moderate-monthly">Activity: Moderate (Monthly)</option>
-              <option value="moderate-quarterly">Activity: Moderate (Quarterly)</option>
-              <option value="low-weekly">Low (Weekly)</option>
-              <option value="low-monthly">Low (Monthly)</option>
-              <option value="low-quarterly">Low (Quarterly)</option>
-              <option value="high-weekly">High (Weekly)</option>
-              <option value="high-monthly">High (Monthly)</option>
-              <option value="high-quarterly">High (Quarterly)</option>
+            <select value={conditions} onChange={(e) => setConditions(e.target.value)} className="w-full border p-2 rounded">
+              <option value="">Medical conditions (optional)</option>
+              <option value="none">None</option>
+              <option value="diabetes">Diabetes</option>
+              <option value="asthma">Asthma</option>
+              <option value="hypertension">Hypertension</option>
+              <option value="other">Not on list</option>
             </select>
-            <input placeholder="Conditions (optional)" value={conditions} onChange={(e) => setConditions(e.target.value)} className="w-full border p-2 rounded" />
-            {hobbies.map((h, i) => <input key={i} placeholder={`Hobby ${i+1}`} value={h} onChange={(e) => setHobbies(hobbies.map((x, idx) => idx === i ? e.target.value : x))} className="w-full border p-2 rounded" />)}
+            <input placeholder="Favourite weekly activity" value={weeklyHobby} onChange={(e) => setWeeklyHobby(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Favourite monthly activity" value={monthlyHobby} onChange={(e) => setMonthlyHobby(e.target.value)} className="w-full border p-2 rounded" />
+            <input placeholder="Favourite quarterly activity" value={quarterlyHobby} onChange={(e) => setQuarterlyHobby(e.target.value)} className="w-full border p-2 rounded" />
             <select value={tone} onChange={(e) => setTone(e.target.value)} className="w-full border p-2 rounded">
               <option value="warm">Warm</option>
               <option value="gentle">Gentle</option>
